@@ -21,6 +21,10 @@ using Plots
 using JLD2, SparseArrays, DataFrames
 using Distances
 
+# Set working directory by: cd("../mydir/someotherdir/")
+
+cd("C:\\Users\\phper\\Documents\\GitHub\\pedrohbraga\\ExploringJulia")
+
 # Creating species
 species = ["Dog", "Cat", "Human", "Monkey", "Alien"];
 

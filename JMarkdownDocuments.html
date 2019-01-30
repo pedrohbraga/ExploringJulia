@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<HTML lang = "en">
+<HEAD>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Weaving Markdown Documents with Julia</title>
+  
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: { equationNumbers: { autoNumber: "AMS" } }
+    });
+  </script>
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  <style type="text/css">
+  @font-face {
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 600;
+}
+html {
+  font-family: sans-serif; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+body {
+  margin: 0;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  border: 0;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure {
+  margin: 1em 40px;
+}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit; /* 1 */
+  font: inherit; /* 2 */
+  margin: 0; /* 3 */
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+  cursor: pointer; /* 3 */
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0; /* 1 */
+  padding: 0; /* 2 */
+}
+textarea {
+  overflow: auto;
+}
+optgroup {
+  font-weight: bold;
+}
+table {
+  font-family: monospace, monospace;
+  font-size : 0.8em;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+thead th {
+    border-bottom: 1px solid black;
+    background-color: white;
+}
+tr:nth-child(odd){
+  background-color: rgb(248,248,248);
+}
+
+
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/29/2014
+*/
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+.column,
+.columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box; }
+@media (min-width: 400px) {
+  .container {
+    width: 85%;
+    padding: 0; }
+}
+@media (min-width: 550px) {
+  .container {
+    width: 80%; }
+  .column,
+  .columns {
+    margin-left: 4%; }
+  .column:first-child,
+  .columns:first-child {
+    margin-left: 0; }
+
+  .one.column,
+  .one.columns                    { width: 4.66666666667%; }
+  .two.columns                    { width: 13.3333333333%; }
+  .three.columns                  { width: 22%;            }
+  .four.columns                   { width: 30.6666666667%; }
+  .five.columns                   { width: 39.3333333333%; }
+  .six.columns                    { width: 48%;            }
+  .seven.columns                  { width: 56.6666666667%; }
+  .eight.columns                  { width: 65.3333333333%; }
+  .nine.columns                   { width: 74.0%;          }
+  .ten.columns                    { width: 82.6666666667%; }
+  .eleven.columns                 { width: 91.3333333333%; }
+  .twelve.columns                 { width: 100%; margin-left: 0; }
+
+  .one-third.column               { width: 30.6666666667%; }
+  .two-thirds.column              { width: 65.3333333333%; }
+
+  .one-half.column                { width: 48%; }
+
+  /* Offsets */
+  .offset-by-one.column,
+  .offset-by-one.columns          { margin-left: 8.66666666667%; }
+  .offset-by-two.column,
+  .offset-by-two.columns          { margin-left: 17.3333333333%; }
+  .offset-by-three.column,
+  .offset-by-three.columns        { margin-left: 26%;            }
+  .offset-by-four.column,
+  .offset-by-four.columns         { margin-left: 34.6666666667%; }
+  .offset-by-five.column,
+  .offset-by-five.columns         { margin-left: 43.3333333333%; }
+  .offset-by-six.column,
+  .offset-by-six.columns          { margin-left: 52%;            }
+  .offset-by-seven.column,
+  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
+  .offset-by-eight.column,
+  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
+  .offset-by-nine.column,
+  .offset-by-nine.columns         { margin-left: 78.0%;          }
+  .offset-by-ten.column,
+  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
+  .offset-by-eleven.column,
+  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
+
+  .offset-by-one-third.column,
+  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
+  .offset-by-two-thirds.column,
+  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
+
+  .offset-by-one-half.column,
+  .offset-by-one-half.columns     { margin-left: 52%; }
+
+}
+html {
+  font-size: 62.5%; }
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222; }
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-weight: 300; }
+h1 { font-size: 3.6rem; line-height: 1.2;  letter-spacing: -.1rem;}
+h2 { font-size: 3.4rem; line-height: 1.25; letter-spacing: -.1rem; }
+h3 { font-size: 3.2rem; line-height: 1.3;  letter-spacing: -.1rem; }
+h4 { font-size: 2.8rem; line-height: 1.35; letter-spacing: -.08rem; }
+h5 { font-size: 2.4rem; line-height: 1.5;  letter-spacing: -.05rem; }
+h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
+
+p {
+  margin-top: 0; }
+a {
+  color: #1EAEDB; }
+a:hover {
+  color: #0FA0CE; }
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box; }
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="button"]:focus {
+  color: #333;
+  border-color: #888;
+  outline: 0; }
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+  color: #FFF;
+  background-color: #33C3F0;
+  border-color: #33C3F0; }
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+  color: #FFF;
+  background-color: #1EAEDB;
+  border-color: #1EAEDB; }
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 38px;
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box; }
+/* Removes awkward default styles on some inputs for iOS */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none; }
+textarea {
+  min-height: 65px;
+  padding-top: 6px;
+  padding-bottom: 6px; }
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 1px solid #33C3F0;
+  outline: 0; }
+label,
+legend {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600; }
+fieldset {
+  padding: 0;
+  border-width: 0; }
+input[type="checkbox"],
+input[type="radio"] {
+  display: inline; }
+label > .label-body {
+  display: inline-block;
+  margin-left: .5rem;
+  font-weight: normal; }
+ul {
+  list-style: circle; }
+ol {
+  list-style: decimal; }
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-size: 90%; }
+li {
+  margin-bottom: 1rem; }
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #E1E1E1; }
+th:first-child,
+td:first-child {
+  padding-left: 0; }
+th:last-child,
+td:last-child {
+  padding-right: 0; }
+button,
+.button {
+  margin-bottom: 1rem; }
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 1.5rem; }
+pre,
+blockquote,
+dl,
+figure,
+table,
+p,
+ul,
+ol,
+form {
+  margin-bottom: 2.5rem; }
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+hr {
+  margin-top: 3rem;
+  margin-bottom: 3.5rem;
+  border-width: 0;
+  border-top: 1px solid #E1E1E1; }
+.container:after,
+.row:after,
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre.sourceCode.julia {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre.julia-error {
+  color : red
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+code {
+  padding: 2px 4px;
+  font-size: 90%;
+
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+@media (min-width: 400px) {}
+@media (min-width: 550px) {}
+@media (min-width: 750px) {}
+@media (min-width: 1000px) {}
+@media (min-width: 1200px) {}
+
+h1.title {margin-top : 20px}
+img {max-width : 100%}
+div.title {text-align: center;}
+
+  </style>
+
+  
+<style>
+pre.hljl {
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 5px;
+    overflow-x: auto;
+    color: rgb(68,68,68); background-color: rgb(251,251,251); }
+pre.hljl > span.hljl-t { }
+pre.hljl > span.hljl-w { }
+pre.hljl > span.hljl-e { }
+pre.hljl > span.hljl-eB { }
+pre.hljl > span.hljl-o { }
+pre.hljl > span.hljl-k { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kc { color: rgb(59,151,46); font-style: italic; }
+pre.hljl > span.hljl-kd { color: rgb(214,102,97); font-style: italic; }
+pre.hljl > span.hljl-kn { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kp { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kr { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kt { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-n { }
+pre.hljl > span.hljl-na { }
+pre.hljl > span.hljl-nb { }
+pre.hljl > span.hljl-nbp { }
+pre.hljl > span.hljl-nc { }
+pre.hljl > span.hljl-ncB { }
+pre.hljl > span.hljl-nd { color: rgb(214,102,97); }
+pre.hljl > span.hljl-ne { }
+pre.hljl > span.hljl-neB { }
+pre.hljl > span.hljl-nf { color: rgb(66,102,213); }
+pre.hljl > span.hljl-nfm { color: rgb(66,102,213); }
+pre.hljl > span.hljl-np { }
+pre.hljl > span.hljl-nl { }
+pre.hljl > span.hljl-nn { }
+pre.hljl > span.hljl-no { }
+pre.hljl > span.hljl-nt { }
+pre.hljl > span.hljl-nv { }
+pre.hljl > span.hljl-nvc { }
+pre.hljl > span.hljl-nvg { }
+pre.hljl > span.hljl-nvi { }
+pre.hljl > span.hljl-nvm { }
+pre.hljl > span.hljl-l { }
+pre.hljl > span.hljl-ld { color: rgb(148,91,176); font-style: italic; }
+pre.hljl > span.hljl-s { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sa { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sb { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sc { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sd { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdC { color: rgb(201,61,57); }
+pre.hljl > span.hljl-se { color: rgb(59,151,46); }
+pre.hljl > span.hljl-sh { color: rgb(201,61,57); }
+pre.hljl > span.hljl-si { }
+pre.hljl > span.hljl-so { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sr { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ss { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ssB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-nB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nbB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nfB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nh { color: rgb(59,151,46); }
+pre.hljl > span.hljl-ni { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nil { color: rgb(59,151,46); }
+pre.hljl > span.hljl-noB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-oB { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-ow { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-p { }
+pre.hljl > span.hljl-c { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-ch { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cm { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cp { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cpB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cs { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-csB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-g { }
+pre.hljl > span.hljl-gd { }
+pre.hljl > span.hljl-ge { }
+pre.hljl > span.hljl-geB { }
+pre.hljl > span.hljl-gh { }
+pre.hljl > span.hljl-gi { }
+pre.hljl > span.hljl-go { }
+pre.hljl > span.hljl-gp { }
+pre.hljl > span.hljl-gs { }
+pre.hljl > span.hljl-gsB { }
+pre.hljl > span.hljl-gt { }
+</style>
+
+
+
+</HEAD>
+  <BODY>
+    <div class ="container">
+      <div class = "row">
+        <div class = "col-md-12 twelve columns">
+
+          <div class="title">
+            <h1 class="title">Weaving Markdown Documents with Julia</h1>
+            <h5>Pedro Henrique Pereira Braga</h5>
+            <h5>January 26th, 2019</h5>
+          </div>
+
+          <blockquote>
+<p>Welcome&#33; I built this tutorial because I have been interested in using Julia to perform some of the analyses related to my doctorate thesis. When learning new <code>R</code> routines and functions, I have always found it easier to write <code>RMarkdown</code> documents and tutorials as a way of learning. Do not hesitate to give your feedback or your contributions to this document.</p>
+<blockquote>
+<p>With regards, <a href="https://github.com/pedrohbraga">Pedro Henrique Braga</a>.</p>
+</blockquote>
+</blockquote>
+<h1>Introduction</h1>
+<p>This document gives a brief illustration on how to create a scientific report document using <a href="http://julialang.org/">Julia</a> and its <a href="https://github.com/mpastell/Weave.jl">Weave.jl</a> package. The <code>Weave.jl</code> package was built by <a href="https://github.com/mpastell/">Matti Pastell</a>, and it allows the &quot;writing of text, mathematics and code in a single document which can be run capturing results into a rich report&quot;. Visit <code>Weave.jl</code>&#39;s <a href="http://weavejl.mpastell.com/">documentation</a> and <a href="http://dx.doi.org/10.21105/joss.00204">publication</a> for further information.</p>
+<p>For this, you will need to install the <code>Weave.jl</code> package:</p>
+
+
+
+<pre class='hljl'>
+<span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>Pkg</span><span class='hljl-p'>;</span><span class='hljl-t'> </span><span class='hljl-n'>Pkg</span><span class='hljl-oB'>.</span><span class='hljl-n'>add</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Weave&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<h1>Getting started</h1>
+<h2>The YAML header</h2>
+<p>Julia&#39;s markdown documents hold the extension <code>.jmd</code> and are built using markup language. To learn more on Markdown, visit this <a href="https://www.markdownguide.org/">website</a> or access this <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">cheatsheet</a>.</p>
+<p>As I start point, I suggest that you create a <code>.jmd</code> document, so your Julia IDE can properly highlight your markdown syntax &#40;currently available within Atom through the <a href="https://atom.io/packages/language-weave">language-weave</a> extension&#41;. Once created, you will need to start your document with an <code>YMAL</code> header, as in the example below:</p>
+
+
+
+<pre class='hljl'>
+<span class='hljl-oB'>---</span><span class='hljl-t'>
+</span><span class='hljl-n'>title</span><span class='hljl-oB'>:</span><span class='hljl-t'> </span><span class='hljl-n'>Creating</span><span class='hljl-t'> </span><span class='hljl-n'>Scientific</span><span class='hljl-t'> </span><span class='hljl-n'>Reports</span><span class='hljl-t'> </span><span class='hljl-n'>with</span><span class='hljl-t'> </span><span class='hljl-n'>Julia</span><span class='hljl-t'>
+</span><span class='hljl-n'>author</span><span class='hljl-oB'>:</span><span class='hljl-t'> </span><span class='hljl-n'>Pedro</span><span class='hljl-t'> </span><span class='hljl-n'>Henrique</span><span class='hljl-t'> </span><span class='hljl-n'>Pereira</span><span class='hljl-t'> </span><span class='hljl-n'>Braga</span><span class='hljl-t'>
+</span><span class='hljl-n'>date</span><span class='hljl-oB'>:</span><span class='hljl-t'> </span><span class='hljl-n'>January</span><span class='hljl-t'> </span><span class='hljl-ni'>26</span><span class='hljl-n'>th</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>2019</span><span class='hljl-t'>
+</span><span class='hljl-oB'>---</span>
+</pre>
+
+
+<p>As seen in the beginning of this document, the above YAML allows <code>Julia</code> to add a title, an author name and a date to your document.</p>
+<p>You can then begin writing your text below the <code>---</code>. Following the Markdown language, you can indicate titles and subtitles with <code>#</code> and <code>##</code>, <code>###</code> &#40;and other variants&#41;, respectively.</p>
+
+
+
+<pre class='hljl'>
+<span class='hljl-cs'># Section Header One</span><span class='hljl-t'>
+
+</span><span class='hljl-n'>Hi!</span><span class='hljl-t'> </span><span class='hljl-n'>My</span><span class='hljl-t'> </span><span class='hljl-n'>name</span><span class='hljl-t'> </span><span class='hljl-n'>is</span><span class='hljl-t'> </span><span class='hljl-oB'>**</span><span class='hljl-n'>Pedro</span><span class='hljl-oB'>**!</span><span class='hljl-t'>
+
+</span><span class='hljl-cs'>## Section Header Two</span><span class='hljl-t'>
+
+</span><span class='hljl-n'>As</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'> </span><span class='hljl-n'>Markdown</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>you</span><span class='hljl-t'> </span><span class='hljl-n'>can</span><span class='hljl-t'> </span><span class='hljl-n'>use</span><span class='hljl-t'> </span><span class='hljl-n'>many</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-oB'>-</span><span class='hljl-n'>line</span><span class='hljl-t'> </span><span class='hljl-n'>elements</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>such</span><span class='hljl-t'> </span><span class='hljl-n'>as</span><span class='hljl-t'> </span><span class='hljl-n'>the</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-n'>single</span><span class='hljl-oB'>-</span><span class='hljl-n'>asterisks</span><span class='hljl-oB'>*</span><span class='hljl-t'>
+</span><span class='hljl-n'>to</span><span class='hljl-t'> </span><span class='hljl-n'>make</span><span class='hljl-t'> </span><span class='hljl-n'>things</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-n'>italic</span><span class='hljl-oB'>*</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>or</span><span class='hljl-t'> </span><span class='hljl-n'>the</span><span class='hljl-t'> </span><span class='hljl-oB'>**</span><span class='hljl-n'>double</span><span class='hljl-oB'>-</span><span class='hljl-n'>asterisks</span><span class='hljl-oB'>**</span><span class='hljl-t'> </span><span class='hljl-n'>to</span><span class='hljl-t'> </span><span class='hljl-n'>make</span><span class='hljl-t'> </span><span class='hljl-n'>your</span><span class='hljl-t'> </span><span class='hljl-n'>text</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'>
+</span><span class='hljl-oB'>**</span><span class='hljl-n'>bold</span><span class='hljl-oB'>**.</span><span class='hljl-t'> </span><span class='hljl-n'>You</span><span class='hljl-t'> </span><span class='hljl-n'>can</span><span class='hljl-t'> </span><span class='hljl-n'>also</span><span class='hljl-t'> </span><span class='hljl-n'>create</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-n'>hyperlinks</span><span class='hljl-p'>](</span><span class='hljl-n'>http</span><span class='hljl-oB'>://</span><span class='hljl-n'>www</span><span class='hljl-oB'>.</span><span class='hljl-n'>julialang</span><span class='hljl-oB'>.</span><span class='hljl-n'>org</span><span class='hljl-p'>)</span><span class='hljl-oB'>.</span><span class='hljl-t'>
+
+</span><span class='hljl-cs'>### Section Header Three</span><span class='hljl-t'>
+</span><span class='hljl-cs'>#### Section Header Four</span><span class='hljl-t'>
+</span><span class='hljl-cs'>##### Section Header Five</span><span class='hljl-t'>
+</span><span class='hljl-cs'>###### Section Header Six</span>
+</pre>
+
+
+<h2>In-line code and code chunks</h2>
+<p>You can write in-line code using one backtick <em>&#96;</em>, or define code chunks using three consecutive backticks <em>&#96;&#96;&#96;</em>.</p>
+<p>You can create a code block without an specified-language, but if you write <code>julia</code> right after the code block delimiter &#40; <em>&#96;&#96;&#96;</em><code>julia</code> &#41; or <code>j</code> after your in-line backtick &#40; <em>&#96;</em><code>julia</code> &#41;, Weave will know that you want to run a julia-language code chunk.</p>
+<pre><code>A code block without a &quot;language&quot;:
+
+function func&#40;x&#41;
+    # ...
+end</code></pre>
+
+
+
+<pre class='hljl'>
+<span class='hljl-cs'># This code block is in Julia code</span><span class='hljl-t'>
+
+</span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>func</span><span class='hljl-p'>(</span><span class='hljl-n'>x</span><span class='hljl-p'>)</span><span class='hljl-t'>
+    </span><span class='hljl-cs'># ...</span><span class='hljl-t'>
+</span><span class='hljl-k'>end</span>
+</pre>
+
+
+<p>If nothing else is written after the backticks, code and output are captured following the default parameters.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-cs'># Loading packages</span><span class='hljl-t'>
+</span><span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>Phylo</span><span class='hljl-t'>
+</span><span class='hljl-k'>using</span><span class='hljl-t'> </span><span class='hljl-n'>DataFrames</span><span class='hljl-t'>
+
+</span><span class='hljl-cs'># Creating species</span><span class='hljl-t'>
+</span><span class='hljl-n'>species</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-s'>&quot;Dog&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;Cat&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;Human&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;Monkey&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;Alien&quot;</span><span class='hljl-p'>];</span><span class='hljl-t'>
+
+</span><span class='hljl-cs'># Creating communities</span><span class='hljl-t'>
+</span><span class='hljl-n'>communities</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>DataFrame</span><span class='hljl-p'>(</span><span class='hljl-n'>Dog</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>],</span><span class='hljl-t'>
+                        </span><span class='hljl-n'>Cat</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>],</span><span class='hljl-t'>
+                        </span><span class='hljl-n'>Human</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-p'>],</span><span class='hljl-t'>
+                        </span><span class='hljl-n'>Monkey</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>],</span><span class='hljl-t'>
+                        </span><span class='hljl-n'>Alien</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'>
+
+</span><span class='hljl-n'>nt</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>rand</span><span class='hljl-p'>(</span><span class='hljl-nf'>Nonultrametric</span><span class='hljl-p'>(</span><span class='hljl-n'>species</span><span class='hljl-p'>))</span><span class='hljl-t'>
+</span><span class='hljl-n'>nt</span>
+</pre>
+
+
+<pre class="hljl">
+BinaryTree&#123;DataFrame,Dict&#123;String,Any&#125;&#125; with 5 tips, 9 nodes and 8 branches.
+Leaf names are Dog, Cat, Human, Monkey and Alien
+</pre>
+
+
+<p>By defining the chunk parameters &#40;separated by <code>;</code>&#41;, you can, for example, hide the code &#40;<code>echo &#61; FALSE</code>&#41;; provide figure captions &#40;<code>fig_cap&#61;&quot;A random walk.&quot;</code>&#41;; define a label &#40;<code>label&#61;&quot;random&quot;</code>&#41;; and, delimit the figure width and height &#40;<code>fig_width&#61;7; fig_height&#61;4</code>&#41;. See below an example of a figure generated using the same above-mentioned chunk options :</p>
+
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>    <div id="f554a1e6-cc3c-4018-a312-d2957d2b4bce" style="width:672px;height:384px;"></div>
+    <script>
+    PLOT = document.getElementById('f554a1e6-cc3c-4018-a312-d2957d2b4bce');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.0,0.006289474781961547,0.012578949563923095,0.018868424345884642,0.02515789912784619,0.03144737390980774,0.037736848691769284,0.04402632347373083,0.05031579825569238,0.05660527303765393,0.06289474781961547,0.06918422260157703,0.07547369738353857,0.08176317216550012,0.08805264694746166,0.09434212172942322,0.10063159651138476,0.10692107129334631,0.11321054607530787,0.1195000208572694,0.12578949563923095,0.13207897042119252,0.13836844520315406,0.1446579199851156,0.15094739476707714,0.1572368695490387,0.16352634433100025,0.16981581911296179,0.17610529389492333,0.1823947686768849,0.18868424345884643,0.19497371824080797,0.20126319302276952,0.20755266780473108,0.21384214258669262,0.22013161736865416,0.22642109215061573,0.23271056693257727,0.2390000417145388,0.24528951649650035,0.2515789912784619,0.25786846606042346,0.26415794084238503,0.27044741562434654,0.2767368904063081,0.2830263651882696,0.2893158399702312,0.29560531475219276,0.3018947895341543,0.30818426431611584,0.3144737390980774,0.3207632138800389,0.3270526886620005,0.33334216344396206,0.33963163822592357,0.34592111300788514,0.35221058778984665,0.3585000625718082,0.3647895373537698,0.3710790121357313,0.37736848691769287,0.38365796169965444,0.38994743648161595,0.3962369112635775,0.40252638604553903,0.4088158608275006,0.41510533560946217,0.4213948103914237,0.42768428517338525,0.4339737599553468,0.44026323473730833,0.4465527095192699,0.45284218430123147,0.459131659083193,0.46542113386515455,0.47171060864711606,0.4780000834290776,0.4842895582110392,0.4905790329930007,0.4968685077749623,0.5031579825569238,0.5094474573388854,0.5157369321208469,0.5220264069028084,0.5283158816847701,0.5346053564667316,0.5408948312486931,0.5471843060306547,0.5534737808126162,0.5597632555945777,0.5660527303765392,0.5723422051585009,0.5786316799404624,0.5849211547224239,0.5912106295043855,0.597500104286347,0.6037895790683085,0.6100790538502702,0.6163685286322317,0.6226580034141932,0.6289474781961548,0.6352369529781163,0.6415264277600778,0.6478159025420395,0.654105377324001,0.6603948521059625,0.6666843268879241,0.6729738016698856,0.6792632764518471,0.6855527512338087,0.6918422260157703,0.6981317007977318,0.7044211755796933,0.7107106503616549,0.7170001251436164,0.723289599925578,0.7295790747075396,0.7358685494895011,0.7421580242714626,0.7484474990534242,0.7547369738353857,0.7610264486173473,0.7673159233993089,0.7736053981812704,0.7798948729632319,0.7861843477451935,0.792473822527155,0.7987632973091165,0.8050527720910781,0.8113422468730397,0.8176317216550012,0.8239211964369627,0.8302106712189243,0.8365001460008858,0.8427896207828474,0.849079095564809,0.8553685703467705,0.861658045128732,0.8679475199106936,0.8742369946926551,0.8805264694746167,0.8868159442565783,0.8931054190385398,0.8993948938205013,0.9056843686024629,0.9119738433844244,0.918263318166386,0.9245527929483475,0.9308422677303091,0.9371317425122706,0.9434212172942321,0.9497106920761937,0.9560001668581553,0.9622896416401168,0.9685791164220784,0.9748685912040399,0.9811580659860014,0.987447540767963,0.9937370155499246,1.000026490331886,1.0063159651138476,1.012605439895809,1.0188949146777708,1.0251843894597323,1.0314738642416938,1.0377633390236554,1.0440528138056169,1.0503422885875784,1.0566317633695401,1.0629212381515016,1.0692107129334631,1.0755001877154247,1.0817896624973862,1.0880791372793477,1.0943686120613094,1.100658086843271,1.1069475616252324,1.113237036407194,1.1195265111891555,1.125815985971117,1.1321054607530785,1.1383949355350402,1.1446844103170017,1.1509738850989633,1.1572633598809248,1.1635528346628863,1.1698423094448478,1.1761317842268095,1.182421259008771,1.1887107337907326,1.195000208572694,1.2012896833546556,1.207579158136617,1.2138686329185788,1.2201581077005403,1.2264475824825019,1.2327370572644634,1.2390265320464249,1.2453160068283864,1.251605481610348,1.2578949563923096,1.2641844311742712,1.2704739059562327,1.2767633807381942,1.2830528555201557,1.2893423303021172,1.295631805084079,1.3019212798660404,1.308210754648002,1.3145002294299635,1.320789704211925,1.3270791789938865,1.3333686537758482,1.3396581285578097,1.3459476033397713,1.3522370781217328,1.3585265529036943,1.3648160276856558,1.3711055024676173,1.377394977249579,1.3836844520315406,1.389973926813502,1.3962634015954636,1.402552876377425,1.4088423511593866,1.4151318259413483,1.4214213007233099,1.4277107755052714,1.4340002502872329,1.4402897250691944,1.446579199851156,1.4528686746331176,1.4591581494150792,1.4654476241970407,1.4717370989790022,1.4780265737609637,1.4843160485429252,1.4906055233248867,1.4968949981068485,1.50318447288881,1.5094739476707715,1.515763422452733,1.5220528972346945,1.528342372016656,1.5346318467986177,1.5409213215805793,1.5472107963625408,1.5535002711445023,1.5597897459264638,1.5660792207084253,1.572368695490387,1.5786581702723486,1.58494764505431,1.5912371198362716,1.597526594618233,1.6038160694001946,1.6101055441821561,1.6163950189641179,1.6226844937460794,1.6289739685280409,1.6352634433100024,1.641552918091964,1.6478423928739254,1.6541318676558872,1.6604213424378487,1.6667108172198102,1.6730002920017717,1.6792897667837332,1.6855792415656947,1.6918687163476565,1.698158191129618,1.7044476659115795,1.710737140693541,1.7170266154755025,1.723316090257464,1.7296055650394255,1.7358950398213873,1.7421845146033488,1.7484739893853103,1.7547634641672718,1.7610529389492333,1.7673424137311948,1.7736318885131566,1.779921363295118,1.7862108380770796,1.792500312859041,1.7987897876410026,1.8050792624229641,1.8113687372049259,1.8176582119868874,1.8239476867688489,1.8302371615508104,1.836526636332772,1.8428161111147334,1.849105585896695,1.8553950606786567,1.8616845354606182,1.8679740102425797,1.8742634850245412,1.8805529598065027,1.8868424345884642,1.893131909370426,1.8994213841523875,1.905710858934349,1.9120003337163105,1.918289808498272,1.9245792832802335,1.9308687580621953,1.9371582328441568,1.9434477076261183,1.9497371824080798,1.9560266571900413,1.9623161319720028,1.9686056067539646,1.974895081535926,1.9811845563178876,1.987474031099849,1.9937635058818106,2.000052980663772,2.0063424554457336,2.012631930227695,2.0189214050096567,2.025210879791618,2.03150035457358,2.0377898293555416,2.044079304137503,2.0503687789194647,2.056658253701426,2.0629477284833877,2.069237203265349,2.0755266780473107,2.0818161528292722,2.0881056276112337,2.0943951023931953,2.1006845771751568,2.1069740519571183,2.1132635267390802,2.1195530015210418,2.1258424763030033,2.132131951084965,2.1384214258669263,2.144710900648888,2.1510003754308493,2.157289850212811,2.1635793249947723,2.169868799776734,2.1761582745586954,2.182447749340657,2.188737224122619,2.1950266989045804,2.201316173686542,2.2076056484685034,2.213895123250465,2.2201845980324264,2.226474072814388,2.2327635475963494,2.239053022378311,2.2453424971602725,2.251631971942234,2.2579214467241955,2.264210921506157,2.270500396288119,2.2767898710700805,2.283079345852042,2.2893688206340035,2.295658295415965,2.3019477701979265,2.308237244979888,2.3145267197618495,2.320816194543811,2.3271056693257726,2.333395144107734,2.3396846188896956,2.345974093671657,2.352263568453619,2.3585530432355806,2.364842518017542,2.3711319927995036,2.377421467581465,2.3837109423634266,2.390000417145388,2.3962898919273496,2.402579366709311,2.4088688414912727,2.415158316273234,2.4214477910551957,2.4277372658371577,2.434026740619119,2.4403162154010807,2.446605690183042,2.4528951649650037,2.459184639746965,2.4654741145289267,2.4717635893108882,2.4780530640928498,2.4843425388748113,2.490632013656773,2.4969214884387343,2.503210963220696,2.5095004380026578,2.5157899127846193,2.522079387566581,2.5283688623485423,2.534658337130504,2.5409478119124653,2.547237286694427,2.5535267614763884,2.55981623625835,2.5661057110403114,2.572395185822273,2.5786846606042344,2.5849741353861964,2.591263610168158,2.5975530849501194,2.603842559732081,2.6101320345140424,2.616421509296004,2.6227109840779654,2.629000458859927,2.6352899336418885,2.64157940842385,2.6478688832058115,2.654158357987773,2.6604478327697345,2.6667373075516965,2.673026782333658,2.6793162571156195,2.685605731897581,2.6918952066795425,2.698184681461504,2.7044741562434655,2.710763631025427,2.7170531058073886,2.72334258058935,2.7296320553713116,2.735921530153273,2.7422110049352346,2.7485004797171966,2.754789954499158,2.7610794292811196,2.767368904063081,2.7736583788450426,2.779947853627004,2.7862373284089657,2.792526803190927,2.7988162779728887,2.80510575275485,2.8113952275368117,2.817684702318773,2.823974177100735,2.8302636518826967,2.836553126664658,2.8428426014466197,2.8491320762285812,2.8554215510105427,2.8617110257925042,2.8680005005744658,2.8742899753564273,2.880579450138389,2.8868689249203503,2.893158399702312,2.8994478744842733,2.9057373492662353,2.912026824048197,2.9183162988301583,2.92460577361212,2.9308952483940813,2.937184723176043,2.9434741979580044,2.949763672739966,2.9560531475219274,2.962342622303889,2.9686320970858504,2.974921571867812,2.9812110466497734,2.9875005214317354,2.993789996213697,3.0000794709956584,3.00636894577762,3.0126584205595814,3.018947895341543,3.0252373701235045,3.031526844905466,3.0378163196874275,3.044105794469389,3.0503952692513505,3.056684744033312,3.062974218815274,3.0692636935972355,3.075553168379197,3.0818426431611585,3.08813211794312,3.0944215927250815,3.100711067507043,3.1070005422890046,3.113290017070966,3.1195794918529276,3.125868966634889,3.1321584414168506,3.138447916198812,3.144737390980774,3.1510268657627356,3.157316340544697,3.1636058153266586,3.16989529010862,3.1761847648905817,3.182474239672543,3.1887637144545047,3.195053189236466,3.2013426640184277,3.207632138800389,3.2139216135823507,3.2202110883643122,3.226500563146274,3.2327900379282357,3.2390795127101972,3.2453689874921587,3.2516584622741203,3.2579479370560818,3.2642374118380433,3.270526886620005,3.2768163614019663,3.283105836183928,3.2893953109658893,3.295684785747851,3.301974260529813,3.3082637353117743,3.314553210093736,3.3208426848756973,3.327132159657659,3.3334216344396204,3.339711109221582,3.3460005840035434,3.352290058785505,3.3585795335674664,3.364869008349428,3.3711584831313894,3.377447957913351,3.383737432695313,3.3900269074772744,3.396316382259236,3.4026058570411974,3.408895331823159,3.4151848066051205,3.421474281387082,3.4277637561690435,3.434053230951005,3.4403427057329665,3.446632180514928,3.4529216552968895,3.459211130078851,3.465500604860813,3.4717900796427745,3.478079554424736,3.4843690292066976,3.490658503988659,3.4969479787706206,3.503237453552582,3.5095269283345436,3.515816403116505,3.5221058778984666,3.528395352680428,3.5346848274623897,3.5409743022443516,3.547263777026313,3.5535532518082746,3.559842726590236,3.5661322013721977,3.572421676154159,3.5787111509361207,3.585000625718082,3.5912901005000437,3.5975795752820052,3.6038690500639667,3.6101585248459283,3.6164479996278898,3.6227374744098517,3.6290269491918132,3.6353164239737747,3.6416058987557363,3.6478953735376978,3.6541848483196593,3.660474323101621,3.6667637978835823,3.673053272665544,3.6793427474475053,3.685632222229467,3.6919216970114284,3.69821117179339,3.704500646575352,3.7107901213573133,3.717079596139275,3.7233690709212364,3.729658545703198,3.7359480204851594,3.742237495267121,3.7485269700490824,3.754816444831044,3.7611059196130054,3.767395394394967,3.7736848691769285,3.7799743439588904,3.786263818740852,3.7925532935228135,3.798842768304775,3.8051322430867365,3.811421717868698,3.8177111926506595,3.824000667432621,3.8302901422145825,3.836579616996544,3.8428690917785056,3.849158566560467,3.8554480413424286,3.8617375161243905,3.868026990906352,3.8743164656883136,3.880605940470275,3.8868954152522366,3.893184890034198,3.8994743648161596,3.905763839598121,3.9120533143800826,3.918342789162044,3.9246322639440057,3.930921738725967,3.937211213507929,3.9435006882898906,3.949790163071852,3.9560796378538137,3.962369112635775,3.9686585874177367,3.974948062199698,3.9812375369816597,3.9875270117636212,3.9938164865455827,4.000105961327544,4.006395436109506,4.012684910891467,4.018974385673429,4.02526386045539,4.031553335237352,4.037842810019313,4.044132284801275,4.050421759583236,4.056711234365198,4.06300070914716,4.069290183929121,4.075579658711083,4.081869133493044,4.088158608275006,4.094448083056967,4.100737557838929,4.10702703262089,4.113316507402852,4.119605982184813,4.125895456966775,4.1321849317487365,4.138474406530698,4.14476388131266,4.1510533560946214,4.157342830876583,4.1636323056585445,4.169921780440506,4.1762112552224675,4.1825007300044295,4.1887902047863905,4.1950796795683525,4.2013691543503136,4.2076586291322755,4.213948103914237,4.2202375786961985,4.2265270534781605,4.232816528260122,4.2391060030420835,4.245395477824045,4.2516849526060065,4.257974427387968,4.26426390216993,4.270553376951891,4.276842851733853,4.283132326515814,4.289421801297776,4.295711276079738,4.302000750861699,4.308290225643661,4.314579700425622,4.320869175207584,4.327158649989545,4.333448124771507,4.339737599553468,4.34602707433543,4.352316549117391,4.358606023899353,4.364895498681314,4.371184973463276,4.377474448245238,4.383763923027199,4.390053397809161,4.396342872591122,4.402632347373084,4.408921822155045,4.415211296937007,4.421500771718968,4.42779024650093,4.434079721282891,4.440369196064853,4.446658670846814,4.452948145628776,4.459237620410738,4.465527095192699,4.471816569974661,4.478106044756622,4.484395519538584,4.490684994320545,4.496974469102507,4.503263943884468,4.50955341866643,4.515842893448391,4.522132368230353,4.528421843012314,4.534711317794276,4.541000792576238,4.547290267358199,4.553579742140161,4.559869216922122,4.566158691704084,4.572448166486045,4.578737641268007,4.585027116049968,4.59131659083193,4.597606065613891,4.603895540395853,4.610185015177814,4.616474489959776,4.622763964741738,4.629053439523699,4.635342914305661,4.641632389087622,4.647921863869584,4.654211338651545,4.660500813433507,4.666790288215468,4.67307976299743,4.679369237779391,4.685658712561353,4.691948187343314,4.698237662125276,4.704527136907238,4.710816611689199,4.717106086471161,4.723395561253122,4.729685036035084,4.735974510817045,4.742263985599007,4.748553460380968,4.75484293516293,4.761132409944891,4.767421884726853,4.773711359508815,4.780000834290776,4.786290309072738,4.792579783854699,4.798869258636661,4.805158733418622,4.811448208200584,4.817737682982545,4.824027157764507,4.830316632546468,4.83660610732843,4.842895582110391,4.849185056892353,4.855474531674315,4.861764006456276,4.868053481238238,4.874342956020199,4.880632430802161,4.886921905584122,4.893211380366084,4.8995008551480455,4.905790329930007,4.9120798047119685,4.91836927949393,4.9246587542758915,4.9309482290578535,4.937237703839815,4.9435271786217765,4.949816653403738,4.9561061281856995,4.9623956029676615,4.9686850777496225,4.9749745525315845,4.981264027313546,4.9875535020955075,4.993842976877469,5.0001324516594305,5.006421926441392,5.012711401223354,5.0190008760053155,5.025290350787277,5.0315798255692386,5.0378693003512,5.044158775133162,5.050448249915123,5.056737724697085,5.063027199479046,5.069316674261008,5.075606149042969,5.081895623824931,5.088185098606892,5.094474573388854,5.100764048170816,5.107053522952777,5.113342997734739,5.1196324725167,5.125921947298662,5.132211422080623,5.138500896862585,5.144790371644546,5.151079846426508,5.157369321208469,5.163658795990431,5.169948270772393,5.176237745554354,5.182527220336316,5.188816695118277,5.195106169900239,5.2013956446822,5.207685119464162,5.213974594246123,5.220264069028085,5.226553543810046,5.232843018592008,5.239132493373969,5.245421968155931,5.251711442937893,5.258000917719854,5.264290392501816,5.270579867283777,5.276869342065739,5.2831588168477,5.289448291629662,5.295737766411623,5.302027241193585,5.308316715975546,5.314606190757508,5.320895665539469,5.327185140321431,5.333474615103393,5.339764089885354,5.346053564667316,5.352343039449277,5.358632514231239,5.3649219890132,5.371211463795162,5.377500938577123,5.383790413359085,5.390079888141046,5.396369362923008,5.402658837704969,5.408948312486931,5.415237787268893,5.421527262050854,5.427816736832816,5.434106211614777,5.440395686396739,5.4466851611787,5.452974635960662,5.459264110742623,5.465553585524585,5.471843060306546,5.478132535088508,5.484422009870469,5.490711484652431,5.497000959434393,5.503290434216354,5.509579908998316,5.515869383780277,5.522158858562239,5.5284483333442,5.534737808126162,5.541027282908123,5.547316757690085,5.553606232472046,5.559895707254008,5.566185182035969,5.572474656817931,5.578764131599893,5.585053606381854,5.591343081163816,5.597632555945777,5.603922030727739,5.6102115055097,5.616500980291662,5.622790455073623,5.629079929855585,5.635369404637546,5.641658879419508,5.64794835420147,5.654237828983431,5.660527303765393,5.666816778547354,5.673106253329316,5.6793957281112775,5.685685202893239,5.6919746776752005,5.6982641524571624,5.7045536272391235,5.7108431020210855,5.7171325768030465,5.7234220515850085,5.7297115263669705,5.7360010011489315,5.7422904759308935,5.7485799507128545,5.7548694254948165,5.761158900276778,5.7674483750587395,5.773737849840701,5.7800273246226626,5.786316799404624,5.792606274186586,5.798895748968547,5.805185223750509,5.811474698532471,5.817764173314432,5.824053648096394,5.830343122878355,5.836632597660317,5.842922072442278,5.84921154722424,5.855501022006201,5.861790496788163,5.868079971570124,5.874369446352086,5.880658921134047,5.886948395916009,5.893237870697971,5.899527345479932,5.905816820261894,5.912106295043855,5.918395769825817,5.924685244607778,5.93097471938974,5.937264194171701,5.943553668953663,5.949843143735624,5.956132618517586,5.962422093299547,5.968711568081509,5.975001042863471,5.981290517645432,5.987579992427394,5.993869467209355,6.000158941991317,6.006448416773278,6.01273789155524,6.019027366337201,6.025316841119163,6.031606315901124,6.037895790683086,6.044185265465047,6.050474740247009,6.056764215028971,6.063053689810932,6.069343164592894,6.075632639374855,6.081922114156817,6.088211588938778,6.09450106372074,6.100790538502701,6.107080013284663,6.113369488066624,6.119658962848586,6.125948437630548,6.132237912412509,6.138527387194471,6.144816861976432,6.151106336758394,6.157395811540355,6.163685286322317,6.169974761104278,6.17626423588624,6.182553710668201,6.188843185450163,6.195132660232124,6.201422135014086,6.207711609796048,6.214001084578009,6.220290559359971,6.226580034141932,6.232869508923894,6.239158983705855,6.245448458487817,6.251737933269778,6.25802740805174,6.264316882833701,6.270606357615663,6.276895832397624,6.283185307179586],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(255, 0, 0, 1.000)","shape":"linear","dash":"dash","width":2.0},"y":[-0.7568024953079282,-0.7687979429150046,-0.7801330261327849,-0.790830536475742,-0.800913192079596,-0.8104035427077365,-0.8193238812954877,-0.8276961618732993,-0.8355419236921331,-0.8428822213596572,-0.8497375607841651,-0.8561278407141877,-0.8620722996554022,-0.8675894679424379,-0.8726971247413574,-0.8774122597587699,-0.8817510394354685,-0.8857287774060782,-0.8893599090111933,-0.8926579696547385,-0.89563557680664,-0.8983044154591658,-0.9006752268543432,-0.9027578003095413,-0.9045609679784629,-0.9060926023953249,-0.9073596166607504,-0.9083679671387711,-0.909122658545227,-0.9096277513186173,-0.9098863711750653,-0.9099007207593761,-0.9096720933141049,-0.9092008882981036,-0.9084866288949986,-0.9075279813605157,-0.9063227761653911,-0.90486803089774,-0.9031599748951732,-0.9011940755826159,-0.8989650664966146,-0.8964669769809476,-0.8936931635415065,-0.8906363428506915,-0.8872886263929516,-0.8836415567435759,-0.8796861454723991,-0.8754129126627517,-0.8708119280337268,-0.8658728536506809,-0.8605849882048726,-0.8549373128382397,-0.8489185384836145,-0.8425171546841493,-0.8357214798484476,-0.8285197128899104,-0.8208999861901501,-0.812850419817043,-0.8043591769181996,-0.7954145202003091,-0.7860048693941368,-0.7761188595939015,-0.7657454003484866,-0.7548737353705145,-0.7434935027177954,-0.7315947952901994,-0.7191682214736799,-0.7062049657520527,-0.6926968490963988,-0.678636388931651,-0.664016858470166,-0.6488323451930347,-0.6330778082515556,-0.6167491345539237,-0.599843193295737,-0.5823578886876295,-0.5642922106292029,-0.5456462830755865,-0.5264214098415019,-0.5066201175876989,-0.4862461957361388,-0.4653047330634264,-0.4438021507267456,-0.4217462314829711,-0.39914614486983196,-0.37601246812785094,-0.35235720265345066,-0.32819378578697744,-0.30353709775447213,-0.27840346359876034,-0.252810649953839,-0.22677785653642923,-0.20032570225000573,-0.17347620581935502,-0.14625276089781844,-0.1186801056145196,-0.09078428655510656,-0.06259261719659172,-0.034133630844629906,-0.0054370281498305195,0.02346638069163999,0.052544738919172496,0.08176521120779964,0.11109405649602218,0.14049670542209355,0.169937842122107,0.19938149011666703,0.2287911019874602,0.25812965252084435,0.28735973497275913,0.3164436600881825,0.345343557489018,0.37402147902698224,0.40243950368284453,0.43055984358045796,0.4583449506735083,0.48575762365483216,0.5127611146327569,0.5393192351161088,0.5653964608494567,0.5909580350428034,0.6159700695453336,0.64039964352092,0.6642148991938813,0.6873851342469196,0.7098808904690921,0.7316740382701089,0.7527378566979702,0.7730471086198742,0.7925781107512943,0.8113087982449244,0.8292187835797097,0.8462894095201194,0.862503795947081,0.8778468803942768,0.8923054521565956,0.9058681798712523,0.9185256325061336,0.9302702937240979,0.9410965696260182,0.9510007899090844,0.9599812025099943,0.968037961835028,0.9751731107103393,0.9813905562159249,0.9866960395954822,0.9910971004615445,0.9946030355407158,0.9972248522274143,0.9989752172360973,0.9998684006614095,0.9999202157729554,0.9991479548863897,0.9975703216651779,0.9952073602176821,0.992080381362149,0.9882118864377193,0.9836254890427715,0.9783458350827834,0.9723985215084973,0.9658100141215923,0.9586075648193595,0.9508191286421599,0.9424732809778279,0.933599135265756,0.9242262615303507,0.914384606058933,0.9041044125232014,0.8934161448261643,0.8823504119381727,0.8709378949664556,0.8592092766826006,0.8471951737117923,0.8349260715665694,0.8224322626864461,0.8097437876231968,0.7968903794899646,0.7839014117708791,0.7708058495665422,0.7576322043298038,0.7444084921257478,0.7311621954298371,0.717920228458877,0.7047089060108265,0.6915539157717369,0.6784802940311244,0.6655124047310795,0.6526739217593284,0.6399878143824165,0.6274763357020724,0.6151610140058403,0.6030626468720279,0.5912012978791089,0.5795962957607853,0.5682662358400586,0.5572289835687344,0.5465016799929417,0.5361007489602522,0.5260419058799898,0.5163401678451659,0.507009864922187,0.49806465241299297,0.4895175238935525,0.48138082483267813,0.47366626659576466,0.4663849406394243,0.45954733270491205,0.4531633368207406,0.4472422689279153,0.4417928799447772,0.43682336809243577,0.43234139030625135,0.4283540725637141,0.42486801896437587,0.42188931940319624,0.419423555684798,0.4174758059325799,0.4160506471535957,0.41515215582737797,0.41478390639462065,0.41494896752983806,0.41564989609070196,0.41688872864593374,0.4186669704932531,0.42098558208908265,0.42384496282255063,0.4272449320777496,0.43118470754034666,0.4356628807175343,0.44067738965391146,0.4462254888403998,0.4523037163286291,0.45890785807948664,0.4660329095917948,0.4736730348753045,0.4818215228514722,0.4904707412858887,0.4996120883776448,0.5092359421535404,0.5193316078387171,0.5298872634001143,0.5408899034851004,0.552325282004581,0.5641778536379582,0.5764307145662739,0.5890655427697673,0.6020625382567606,0.6154003636221301,0.6290560853654849,0.6430051164314817,0.65722116046707,0.6716761583229374,0.6863402373585097,0.7011816641414909,0.7161668011636917,0.7312600682245272,0.7464239091616856,0.7616187646347508,0.776803051691534,0.7919331508681957,0.8069634015923878,0.8218461066731948,0.8365315466721409,0.850968004955345,0.8651018042277002,0.8788773553450335,0.8922372191891533,0.9051221823729708,0.9174713475179154,0.9292222388132163,0.9403109235257837,0.9506721500799128,0.9602395032674802,0.9689455770812876,0.976722165586424,0.9835004721567134,0.9892113373052673,0.9937854852297858,0.997153789074518,0.9992475547817525,0.9999988232665834,0.9993406904997475,0.9972076449250009,0.9935359214703354,0.9882638712370335,0.9813323457679523,0.9726850946074985,0.9622691746716574,0.9500353697484432,0.9359386182487123,0.9199384471260105,0.9019994096837611,0.8820915247905451,0.8601907148314749,0.8362792395378997,0.8103461226611531,0.782387568291076,0.7524073634691362,0.7204172636115079,0.6864373571420519,0.6504964056412654,0.612632155747408,0.572891619002671,0.5313313158227442,0.4880174797847446,0.4430262184782531,0.39644362724908505,0.3483658522870854,0.298899099669081,0.2481595871672362,0.19627343587231272,0.14337649896103705,0.08961412525697819,0.035140855594702286,-0.019879949603516172,-0.07527655269171762,-0.13086935178475956,-0.18647146453592747,-0.2418893823421143,-0.2969236940455081,-0.3513698776114324,-0.4050191576534393,-0.4576594260537237,-0.5090762222946311,-0.5590537694811721,-0.6073760614011492,-0.6538279953447916,-0.698196544796732,-0.7402719655260731,-0.7798490280423835,-0.8167282688635894,-0.8507172525627643,-0.8816318361316259,-0.9092974268256808,-0.9335502243456708,-0.9542384379682366,-0.971223469070876,-0.9843810494072128,-0.9936023254825542,-0.9987948794600615,-0.9998836771974068,-0.9968119342741855,-0.9895418912225692,-0.9780554896175462,-0.9623549412174937,-0.9424631829685827,-0.91842421139439,-0.8903032906808188,-0.8581870296306517,-0.8221833235954715,-0.7824211584879486,-0.739050275026419,-0.6922406924571669,-0.6421820921281107,-0.5890830624401405,-0.5331702078682289,-0.47468712591207923,-0.4138932569938421,-0.3510626134563283,-0.2864823949172481,-0.22045149829157576,-0.15327893179344224,-0.08528214316011687,-0.016785273192783303,0.05188265352760987,0.12038958822553754,0.18840235473335898,0.2555885699804416,0.3216185743101499,0.3861673575612133,0.44891646677184505,0.5095558814154733,0.5677858422564878,0.623318620222001,0.6758802121190132,0.7252119505816701,0.7710720163054163,0.8132368414072273,0.8515023936361632,0.8856853321372073,0.9156240265339757,0.9411794322314553,0.9622358160369798,0.9787013274437667,0.9905084122039101,0.9976140661235691,0.9999999283289855,0.997672214564617,0.9906614923809556,0.9790223013366668,0.9628326225651787,0.9421932032279713,0.9172267424845358,0.8880769466420817,0.8549074620973871,0.8179006955404775,0.7772565316481519,0.733190959148875,0.685934616684706,0.6357312703273781,0.5828362349226249,0.5275147516382405,0.47004033417841645,0.4106930961006302,0.3497580715354652,0.28752354136797287,0.22427937659660965,0.16031541014887113,0.09591984790797552,0.03137772910034504,-0.033030554482704935,-0.09703067169485483,-0.160355689734826,-0.22274732923236037,-0.2839571304874735,-0.3437475255270311,-0.4018928115548694,-0.4581800222897286,-0.5124096946005883,-0.5643965287524576,-0.6139699414594478,-0.6609745117980652,-0.705270320855384,-0.7467331867674659,-0.7852547975375216,-0.8207427447060023,-0.8531204615717563,-0.8823270702313081,-0.9083171422096364,-0.9310603778985214,-0.950541210396775,-0.9667583396598111,-0.9797242031145735,-0.9894643890806855,-0.9960169994614186,-0.9994319682307681,-0.9997703422482659,-0.9971035308841264,-0.9915125308373854,-0.9830871323826001,-0.9719251130904368,-0.9581314248382721,-0.9418173796631655,-0.9230998397155902,-0.9021004162526612,-0.8789446822686632,-0.85376140300285,-0.8266817881939966,-0.7978387695721805,-0.7673663066946118,-0.7353987238477875,-0.7020700803562255,-0.667513576261825,-0.6318609949702857,-0.5952421841048187,-0.5577845754648384,-0.5196127446604233,-0.4808480106840205,-0.44160807539038116,-0.4020067025853805,-0.36215343617494694,-0.3221533565975875,-0.2821068745581694,-0.2421095608968574,-0.20225201126550785,-0.16261974414380187,-0.12329313060872449,-0.08434735417301223,-0.04585239892997694,-0.007873064182980269,0.029530996303393574,0.06630521231764552,0.10240001437684944,0.13777073195303147,0.1723774746206319,0.20618499796383014,0.23916255604018727,0.27128374214502343,0.30252631956070436,0.33287204390747877,0.36230647863888726,0.39081880514632605,0.4184016288549043,0.44505078260752473,0.47076512854672864,0.4955463596156306,0.5193988017105129,0.5423292174294009,0.5643466122737757,0.5854620440750725,0.6056884363342161,0.6250403960817421,0.6435340367884395,0.661186806781926,0.6780173235540196,0.6940452142767053,0.7092909627816985,0.7237757631996805,0.7375213804007299,0.7505500173269806,0.7628841892622913,0.7745466050416238,0.7855600551648291,0.7959473067454725,0.8057310051951951,0.8149335825176878,0.8235771720634755,0.8316835295772765,0.8392739603535216,0.8463692523024139,0.8529896147186584,0.8591546225373187,0.8648831658561424,0.8701934045007658,0.875102727408431,0.8796277166069392,0.883784115568327,0.8875868017210834,0.8910497629103723,0.8941860776025432,0.8970078986380386,0.8995264403455085,0.901751968839298,0.9036937953324266,0.905360272307536,0.9067587923989312,0.9078957898496758,0.9087767444185714,0.9094061876227434,0.9097877112121833,0.9099239777831285,0.9098167334472871,0.9094668224836303,0.9088742039088057,0.9080379699109223,0.9069563660996155,0.9056268135327799,0.9040459324871511,0.9022095679459665,0.9001128167821554,0.8977500566199698,0.8951149763615844,0.8922006083678371,0.8889993622841951,0.8855030605039151,0.881702975260396,0.8775898673398295,0.8731540264034849,0.8683853129062035,0.8632732015941393,0.8578068265603099,0.8519750278311915,0.8457663994515106,0.8391693390274306,0.8321720986807678,0.8247628373584488,0.8169296744325186,0.8086607445164513,0.7999442534133967,0.7907685351015699,0.7811221096510452,0.7709937419550817,0.7603725011477305,0.7492478205679967,0.7376095581193434,0.7254480568618632,0.7127542056632835,0.6995194997239892,0.6857361007806938,0.6713968967833689,0.6564955608306394,0.6410266091401052,0.6249854578222106,0.60836847821938,0.5911730505662196,0.5733976157218406,0.5550417247219581,0.5361060858961266,0.5165926092948142,0.49650444817175887,0.4758460372693448,0.454623127658632,0.43284281789131546,0.41051358122819825,0.387645288717704,0.3642492279088013,0.34033811699520333,0.31592611420190847,0.2910288222410545,0.26566328768171954,0.23984799509735125,0.21360285587524164,0.1869491915945864,0.1599097119030861,0.13250848684663646,0.10477091363245203,0.07672367783256762,0.048394709062100166,0.019813131194674195,-0.008990792794059005,-0.037985721235237885,-0.06713929927952196,-0.09641822933669708,-0.12578834623689938,-0.15521469688029924,-0.18466162411525083,-0.21409285455879634,-0.24347159004857014,-0.27276060239161526,-0.3019223310536704,-0.3309189834122286,-0.35971263717837426,-0.38826534457601675,-0.41653923785320024,-0.44449663568831865,-0.47210015004479994,-0.49931279302113624,-0.526098083238914,-0.5524201513101371,-0.5782438439264056,-0.6035348261164777,-0.6282596812255893,-0.6523860081792261,-0.675882515606311,-0.698719112411321,-0.7208669944021442,-0.7422987266000394,-0.7629883208798993,-0.7829113086130056,-0.802044808010322,-0.8203675858921252,-0.8378601136389519,-0.8545046171095356,-0.8702851203431561,-0.8851874828965668,-0.8991994306990937,-0.9123105803434144,-0.9245124567636586,-0.9357985042865989,-0.9461640910756958,-0.955606507021072,-0.9641249551614319,-0.9717205367556478,-0.978396230152641,-0.9841568636375168,-0.9890090824600193,-0.9929613102775833,-0.9960237052698806,-0.9982081112042933,-0.9995280037522826,-0.9999984323750257,-0.9996359581127862,-0.9984585876263471,-0.996485703850302,-0.9937379936271155,-0.9902373726976068,-0.9860069084278473,-0.9810707406545343,-0.9754540010305695,-0.9691827312501438,-0.9622838005279081,-0.9547848227001191,-0.9467140733069865,-0.9381004070048338,-0.9289731756445616,-0.9193621473388822,-0.9092974268256829,-0.8988093774180853,-0.8879285448141745,-0.8766855830204412,-0.8651111826235373,-0.85323600162444,-0.8410905990284566,-0.8287053713630836,-0.8161104922743252,-0.8033358553304936,-0.7904110201407889,-0.7773651618747915,-0.7642270242475425,-0.7510248760144799,-0.7377864709999525,-0.7245390116636574,-0.7113091161901124,-0.6981227890683664,-0.6850053951114949,-0.6719816368491324,-0.6590755352107132,-0.646310413402384,-0.6337088838671949,-0.6212928382054003,-0.609083439920413,-0.5971011198452704,-0.5853655740952537,-0.5738957643837184,-0.5627099205309924,-0.5518255449896233,-0.5412594192040421,-0.5310276116180419,-0.5211454871399873,-0.5116277178730155,-0.5024882949154058,-0.49374054103544407,-0.48539712402454044,-0.477470070532877,-0.4699707801927241,-0.4629100398363555,-0.4562980376175765,-0.4501443768487767,-0.4444580893685855,-0.439247648259138,-0.43452097973604836,-0.43028547403895856,-0.4265479951556679,-0.4233148892182022,-0.4205919914153021,-0.4183846312719199,-0.4166976361531843,-0.4155353328572237,-0.4149015471689538,-0.4147996012546874,-0.41523230878601136,-0.4162019676900381,-0.41771035043280513,-0.41975869175220315,-0.42234767376756327,-0.4254774084040613,-0.4291474170818457,-0.43335660763236367,-0.4381032484175663,-0.44338493964174,-0.44919858186059586,-0.4555403417080978,-0.46240561487822357,-0.469788986416593,-0.47768418839565907,-0.48608405506702995,-0.4949804756053149,-0.5043643445799598,-0.5142255103147084,-0.5245527213184931,-0.5353335709970255,-0.5465544408807737,-0.5582004426325389,-0.5702553591263564,-0.5827015849189301,-0.5955200664650371,-0.6086902424594445,-0.6221899847194526,-0.6359955400543282,-0.6500814736001908,-0.6644206141314399,-0.6789840018920659,-0.6937408395220993,-0.7086584466856917,-0.7237022190375665,-0.7388355921934675,-0.7540200113975241,-0.7692149076046135,-0.7843776807184876,-0.7994636907462485,-0.8144262576461598,-0.8292166706583689,-0.8437842079162918,-0.8580761671398458,-0.8720379082096624,-0.8856129084135241,-0.8987428311419334,-0.9113676087884615,-0.9234255405817499,-0.9348534060393932,-0.9455865946887644,-0.9555592526459126,-0.964704446580377,-0.9729543455209307,-0.9802404208744921,-0.9864936649375242,-0.9916448280760617,-0.995624674636927,-0.9983642575288095,-0.9997952112777578,-0.9998500632175648,-0.9984625623218131,-0.9955680250215342,-0.9911036971810979,-0.9850091312258779,-0.9772265772293498,-0.9677013865756003,-0.956382426617,-0.9432225045474313,-0.9281787985103434,-0.9112132937599244,-0.892293221494415,-0.8713914977852514,-0.8484871598360827,-0.8235657966244091,-0.7966199708074077,-0.7676496286153497,-0.7366624943129588,-0.7036744456838682,-0.6687098668882723,-0.6318019749617908,-0.5929931161666405,-0.5523350283768957,-0.5098890656805888,-0.46572638141410183,-0.419928065911682,-0.37258523535568966,-0.32379906825411026,-0.2736807862508806,-0.22235157619401802,-0.16994245064567579,-0.11659404431854392,-0.06245634426305228,-0.007688352010163454,0.04754232370685921,0.10305994457272255,0.15868119108249668,0.21421578161347943,0.26946716153129824,0.3242332611073969,0.3783073204252323,0.4314787788364264,0.4835342258994476,0.5342584100988627,0.5834353010076694,0.6308491999254081,0.6762858934072069,0.7195338434996738,0.7603854079265165,0.7986380829257491,0.8340957609392425,0.8665699949003155,0.8958812604634003,0.9218602071772588,0.9443488893267272,0.9632019669623413,0.9782878675083247,0.9894898982912951,0.996707300368846,0.9998562341618581,0.998870687609133,0.9937032978692689,0.9843260779927646,0.9707310404766949,0.9529307101932288,0.9309585198489938,0.9048690818812829,0.8747383315241866,0.840663536677529,0.8027631711766892,0.7611766490846297,0.7160639186998393,0.667604916085996,0.6159988790710382,0.5614635238237525,0.5042340872845158,0.4445622398905794,0.382714874185088,0.31897277601908414,0.2536291861369206,0.18698826096447183,0.11936344238658206,0.0510757471926772,-0.017548012321237948,-0.08617706439022814,-0.15447855764043533,-0.22211947144950334,-0.28876854309776195,-0.354098197733164,-0.417786467031674,-0.4795188824203065,-0.5389903288456421,-0.5959068453138575,-0.6499873587996337,-0.7009653386159322,-0.7485903589512055,-0.7926295580086936,-0.8328689830171772,-0.8691148113157604,-0.9011944387370223,-0.9289574276136117,-0.9522763079009157,-0.9710472261318459,-0.9851904381854967,-0.9946506431474922,-0.9993971568522292,-0.9994239250132453,-0.9947493771539696,-0.9854161238344166,-0.9714905009171384,-0.9530619658160222,-0.9302423518127322,-0.9031649875972633,-0.8719836901813424,-0.8368716402377069,-0.7980201497268097,-0.7556373323792709,-0.7099466882013977,-0.6611856136595637,-0.6096038495733637,-0.5554618790067307,-0.4990292875903741,-0.44058309873878926,-0.38040609614377624,-0.31878514573679345,-0.2560095290198181,-0.19236929927349672,-0.12815367167010838,-0.06364945775254874,0.0008604459003946765,0.06509850571152546,0.12879392750147714,0.1916839537159844,0.2535150748120267,0.31404414901592204,0.3730394255723879,0.430281467519321,0.4855639709414521,0.5386944785659483,0.5894949864580454,0.6378024434452996,0.6834691437392539,0.7263630140246911,0.7663677970453656,0.8033831344235621,0.8373245521063947,0.8681233524295517,0.8957264173264655,0.9200959276857086,0.9412090042698938,0.9590572759551145,0.9736463813306395,0.9849954099152619,0.9931362894000952,0.9981131254201727,0.9999815003907649,0.9988077379221307,0.9946681392514596,0.9876481980067742,0.9778417994483679,0.9653504101231177,0.9502822636199296,0.9327515478352392,0.9128775988499905,0.8907841061888282,0.8665983338821498,0.8404503613871551,0.812472348048593,0.7827978243982978,0.7515610132078415,0.7188961828251506,0.6849370349462595,0.6498161286011858,0.6136643417707368,0.5766103717013188,0.5387802746499284,0.5002970454731367,0.4612802371739657,0.42184562023972855,0.3821048813442633,0.34216536074911374,0.3021298275214648,0.26209629149187474,0.22215785070219574,0.18240257294315643,0.14291340985210332,0.10376814193285915,0.06503935277177554,0.026794430655636678,-0.010904404253301157,-0.04800004906206281,-0.08444044550494507,-0.12017848740914533,-0.1551719101496267,-0.1893831639490566,-0.22277927284176438,-0.2553316810733031,-0.28701608865080974,-0.317812277695472,-0.34770393117756093,-0.3766784455384259,-0.40472673862319813,-0.43184305426409636,-0.45802476476764376,-0.48327217247149007,-0.5075883114476193,-0.5309787503403645,-0.5534513972398175,-0.5750163074047294,-0.5956854945646135,-0.6154727464485585,-0.6343934451091069,-0.652464392533422,-0.669703641961469,-0.6861303352619349,-0.7017645466519309,-0.7166271329853839,-0.7307395907784272,-0.7441239200875579,-0.7568024953079278],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,1.0,2.0,3.0,4.0,5.0,6.0],"visible":true,"ticks":"inside","range":[-0.18849555921538758,6.471680866394974],"domain":[0.058768695579719206,0.9941413573303337],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","1","2","3","4","5","6"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":384,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,-0.5,0.0,0.5,1.0],"visible":true,"ticks":"inside","range":[-1.0599983831961461,1.059999879150106],"domain":[0.0391878098571012,0.989747375328084],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1.0","-0.5","0.0","0.5","1.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":672});
+    </script>
+
+
+<p>Access Weave&#39;s <a href="http://weavejl.mpastell.com/stable/chunk_options/">Chunk options</a> documentation to see the currently supported chunk defining arguments.</p>
+<h2>Quotes</h2>
+<p>You can also quote from external sources, such as books, websites or articles using <code>&gt;</code> following by a single-space before your text. See the following example and it&#39;s consecutive effect:</p>
+<pre><code>Here&#39;s a quote:
+&gt; Julia is a high-level, high-performance dynamic programming language for
+&gt; technical computing, with syntax that is familiar to users of other
+&gt; technical computing environments.
+
+&gt;&gt; You can also set another level or &#96;inline&#96; parameters by adding &#96;&gt;&gt;&#96; and
+&gt;&gt; a space before your &quot;sub-quote&quot;.</code></pre>
+<p>Here&#39;s a quote:</p>
+<blockquote>
+<p>Julia is a high-level, high-performance dynamic programming language for technical computing, with syntax that is familiar to users of other technical computing environments.</p>
+<blockquote>
+<p>You can also set another level or <code>inline</code> parameters by adding <code>&gt;&gt;</code> and a space before your &quot;sub-quote&quot;.</p>
+</blockquote>
+</blockquote>
+<h2>Ordered and Unordered Lists</h2>
+<p>Unordered lists can be written by prepending each item in a list with either <code>*</code>, <code>&#43;</code>, or <code>-</code>.</p>
+<pre><code>An unordered list:
+  * *Italic item*
+  * **Bold item**
+    &#96;&#96;&#96;
+    f&#40;x&#41; &#61; x # Your favorite functions
+    &#96;&#96;&#96;
+  * And a sublist:
+      &#43; Sub-item one
+      &#43; Sub-item two</code></pre>
+<p>An unordered list:</p>
+<ul>
+<li><p><em>Italic item</em></p>
+</li>
+<li><p><strong>Bold item</strong></p>
+<pre><code>f&#40;x&#41; &#61; x # Your favorite functions</code></pre>
+</li>
+<li><p>And a sublist:</p>
+<ul>
+<li><p>Sub-item one</p>
+</li>
+<li><p>Sub-item two</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Ordered lists are written by replacing the &quot;bullet&quot; character, either <code>*</code>, <code>&#43;</code>, or <code>-</code>, with a positive integer followed by either <code>.</code> or <code>&#41;</code>.</p>
+<pre><code>One ordered list starting from 1. to 3.:
+ 1. Item one
+ 2. Item two
+ 3. Item three
+
+You can also create another list starting from numbers 5. to 7.:
+ 5&#41; Item five
+ 6&#41; Item six
+ 7&#41; Item seven</code></pre>
+<p>One ordered list starting from 1. to 3.:</p>
+<ol>
+<li><p>Item one</p>
+</li>
+<li><p>Item two</p>
+</li>
+<li><p>Item three</p>
+</li>
+</ol>
+<p>You can also create another list starting from numbers 5. to 7.:</p>
+<ol start="5">
+<li><p>Item five</p>
+</li>
+<li><p>Item six</p>
+</li>
+<li><p>Item seven</p>
+</li>
+</ol>
+<h2>Footnotes</h2>
+<p>You can also use footnotes to add numbered <a href="#footnote-1" class="footnote">[1]</a> or named footnotes <a href="#footnote-named" class="footnote">[named]</a> to paragraphs. For this, you can add <code>&#91;^number&#93;</code> or <code>&#91;^text&#93;</code> after a desired text, and then append it to your desired place in the text by writing the following syntax:</p>
+<pre><code>&#91;^1&#93;: Numbered footnote text.
+
+&#91;^named&#93;:
+    Named footnote text containing several toplevel elements.
+      * item one
+      * item two
+      * item three
+
+    &#96;&#96;&#96;julia
+    function func&#40;x&#41;
+        # ...
+    end
+    &#96;&#96;&#96;</code></pre>
+<h2>Weaving the document</h2>
+<p>When you are finally done with your document, you can save it to your preferred directory and then <em>Weave</em> it. You can do this with the help of the <code>weave</code> function. Type and run <code>?weave</code> to learn about the function&#39;s arguments or access the <a href="http://weavejl.mpastell.com/stable/usage/">documentation</a>. Run <code>list_out_formats&#40;&#41;</code> to see supported output formats. Below, you can see examples showing how to weave this document to Markdown, HTML and PDF.</p>
+
+
+
+<pre class='hljl'>
+<span class='hljl-cs'># Output it to Markdown</span><span class='hljl-t'>
+</span><span class='hljl-nf'>weave</span><span class='hljl-p'>(</span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;JMarkdownDocuments.jmd&quot;</span><span class='hljl-p'>),</span><span class='hljl-t'>
+      </span><span class='hljl-n'>informat</span><span class='hljl-oB'>=</span><span class='hljl-s'>&quot;markdown&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'>
+      </span><span class='hljl-n'>out_path</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-sc'>:pwd</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-cs'># This outputs the document to your current working directory</span><span class='hljl-t'>
+      </span><span class='hljl-n'>doctype</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;pandoc&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+</span><span class='hljl-cs'># to HTML</span><span class='hljl-t'>
+</span><span class='hljl-nf'>weave</span><span class='hljl-p'>(</span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;JMarkdownDocuments.jmd&quot;</span><span class='hljl-p'>),</span><span class='hljl-t'>
+      </span><span class='hljl-n'>informat</span><span class='hljl-oB'>=</span><span class='hljl-s'>&quot;markdown&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'>
+      </span><span class='hljl-n'>out_path</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-sc'>:pwd</span><span class='hljl-p'>,</span><span class='hljl-t'>
+      </span><span class='hljl-n'>doctype</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;md2html&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+</span><span class='hljl-cs'># to PDF</span><span class='hljl-t'>
+</span><span class='hljl-nf'>weave</span><span class='hljl-p'>(</span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;JMarkdownDocuments.jmd&quot;</span><span class='hljl-p'>),</span><span class='hljl-t'>
+      </span><span class='hljl-n'>informat</span><span class='hljl-oB'>=</span><span class='hljl-s'>&quot;markdown&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'>
+      </span><span class='hljl-n'>out_path</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-sc'>:pwd</span><span class='hljl-p'>,</span><span class='hljl-t'>
+      </span><span class='hljl-n'>doctype</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;md2pdf&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<h1>Learn more</h1>
+<p>Read the <code>Weave.jl</code> documentation:</p>
+<ul>
+<li><p>Stable release: <a href="http://mpastell.github.io/Weave.jl/stable/">http://mpastell.github.io/Weave.jl/stable/</a></p>
+</li>
+<li><p>Latest release: <a href="http://mpastell.github.io/Weave.jl/latest/">http://mpastell.github.io/Weave.jl/latest/</a></p>
+</li>
+</ul>
+<p>Read the <code>julia</code> Markdown documentation: <a href="https://docs.julialang.org/en/v1/stdlib/Markdown/">https://docs.julialang.org/en/v1/stdlib/Markdown/</a></p>
+<h4>References</h4>
+<ol>
+<li><p>Bezanson, Jeff, Alan Edelman, Stefan Karpinski, and Viral B. Shah. 2017. “Julia: A Fresh Approach to Numerical Computing.” SIAM Review 59 &#40;1&#41;: 65–98. doi:10.1137/141000671.</p>
+</li>
+<li><p>Xie, Yihui. 2015. Dynamic Documents with R and Knitr. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. http://yihui.name/knitr/.</p>
+</li>
+</ol>
+
+
+
+          <HR/>
+          <div class="footer"><p>
+          Published from <a href="JMarkdownDocuments.jmd">JMarkdownDocuments.jmd</a> using
+          <a href="http://github.com/mpastell/Weave.jl">Weave.jl</a>
+           on 2019-01-26.
+          <p></div>
+
+
+        </div>
+      </div>
+    </div>
+  </BODY>
+</HTML>

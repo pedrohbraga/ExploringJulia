@@ -1,0 +1,363 @@
+---
+title: First time in Julia!
+author: Pedro Henrique Pereira Braga
+date: January 29th, 2019
+---
+
+*Hi! I am new to `Julia`. I am starting with the basics in it. These notes
+will cover the following topics:*
+
+# The REPL
+
+`julia` starts the interactive REPL (*r*ead, *e*valuate, *p*rint and *l*oop) by
+default. We can start experiment using this part!
+
+Let's start by writing a number in Julia and pressing `Enter` or `Return`.
+
+```
+julia> 42
+```
+```
+42
+```
+You can see that `julia` evaluated and returned to you what you just run.
+
+As expected, we can use Julia as a calculator.
+
+```{julia; eval = false}
+julia> 2+2
+```
+```{julia; eval = false}
+4
+```
+> See that if you write `4 +` and press `Enter`, `julia` will be waiting for you
+> to provide more information (as you told her that you are adding another
+> number). Once you type another number and press `Enter`, you will see her
+> answer.
+
+Writing `?` before a given function will bring us some documentation, if available.
+```
+julia> println
+help?> println
+```
+> You will see that the name `julia` changes automatically to `help?`!
+
+We can also use shell commands by adding `;` before your preferred command:
+```{julia; eval = false}
+# type ;pwd
+shell> pwd
+```
+> Note that here, `julia` changes to `shell` when you type `;`!
+
+# Getting started
+
+*Now, we can start using the `julia` script, which will allow you to always see
+your text and notes! When you wish to run your code, hit `Ctrl` and `Enter` or
+`Shift` and `Enter`, or hit the `Run` button above.*
+
+Let's first do some very simple tasks!
+
+Let's print values with the help of the function `println()`:
+```{julia}
+println("I'm excited to learn Julia!")
+```
+
+Now, we can use the `=` to assign variables. Let's assign `42` to a variable named
+`answer_to_life`, and then run it right after:
+```{julia}
+answer_to_life = 42
+answer_to_life
+```
+
+Sweet! Now let's do it again:
+```{julia}
+my_shorter_pi = 3.14159
+```
+
+What if I wanted to use *emojis*? You can use emojis 😸 in Julia and assign them values!
+
+```{julia; repl = true}
+😺 = "smiley cat!"
+```
+> You can type emoji's by typing `\:smi` and then selecting one with your arrow
+> directional arrows, and then pressing `Enter`.
+
+It is also easy to reassign values to variables, without needing to defining or
+reassigning  the type of variable it will become:
+```{julia}
+😺 = 1
+😺
+```
+> Like in R, you can also comment code in Julia using the `#` sign.
+
+# Variable types in `Julia`
+
+Each object in Julia (informally, this means everything you can put into a variable in Julia) has a type. If you want to be well-informed about variable types, you should go to `Julia`'s [Documentation] page, as I will not get in much detail about them. However, here is a brief summary on the types of variables you will see more often in `Julia`:
+1. Basic integer and float types: `Int8`, `UInt8`, `Int16`,` UInt16`, `Int32`, `UInt32`, `Int64`, `UInt64`, `Int128`, `UInt128`, `Float16`, `Float32`, and `Float64`;
+2. Advanced numeric types: `BigFloat`, `BigInt`;
+3. Boolean and character types: Bool and Char;
+4. Text string types: `String`
+5. Anything types: `Any`
+
+> *OK. This is good to know, but why should I care about the type of variables?*
+>> The performance of a given `Julia` code is affected by the choice of variable
+>> types. Try spotting the only difference between the two functions below:
+```julia
+# Do not worry about the syntax you are not confortable with!
+# We will get to that later!
+
+function t1(n)
+  s = 0
+  t = 1
+  for i in 1:n
+     s += s/i
+     t = div(t, i)
+  end
+  return t
+end
+
+function t2(n)
+  s  = 0.0
+  t = 1
+  for i in 1:n
+     s += s/i
+     t = div(t, i)
+  end
+  return t
+end
+```
+
+Note the variable `s`, in the function `t2` is assigned to the value `0.0`,
+while in the function `t1`, it is assigned to `0`. While `0` is equal to `0.0`
+(I hope it always stays like that 🙎!), `s` in `t1` has an integer-type, while
+in `t2` becomes a `floating-point`, because of the decimal.
+
+Now, look at the difference in time allocation to run both functions:
+
+```{julia; term = true}
+@time t1(1000000000)
+```
+
+```{julia; term = true}
+@time t2(1000000000)
+```
+
+Performance of `t1` is inferior than `t2`, meaning that both time and memory
+allocation were greater in `t1`. If you want to compare the amount of extra compiled code that this small
+difference causes the Julia compiler to generate, run the commands `@code_native
+t1(100)` and `@code_native t2(100)`.
+
+#### Identifying variable types
+
+Whenever you run objects that have more than one element, `julia` will likely
+tell you its type.  If not, you can identify the type of a given object using
+the function `typeof()`.
+
+```julia
+typeof(answer_to_life)
+```
+```julia
+😺 = "smiley cat!"
+typeof(😺)
+```
+
+# Storage in julia
+
+In `julia`, we store related elements in **arrays**, **tuples**, or **dictionaries**.
+
+## Arrays
+
+An array is an ordered collection of elements. We can indcate them with square
+brackets `[]` and comma-separated values `,`. In `julia`, arrays will be used
+for vectors, tables, matrices and lists.
+> An unidimensional array will act as a **vector**. A two-dimensional array will
+> be used as a **table** or a **matrix**. Any array above three dimensions can
+> be thought as a **multi-dimensional matrix**.
+
+### Creating Arrays
+
+Let's look at what `julia` tells us when we create a unidimensional array:
+```julia
+a = [1, 2, 3, 4, 5]
+a
+```
+> We can see that `julia` is telling us that we have created an array with 5
+> elements, with each one being a 64-bit integer.
+
+Now let's look at the following one:
+```julia
+b = [1.0, 2, 3, 4, 5]
+b
+```
+> We can see that `julia` has recognized that there is an element that looks liek
+ a floating-point number, and then it will automatically tell us that this array
+ has floating elements with 64-bits.
+
+The same happens if you insert strings in the array:
+```julia
+s = ["this",
+     "is",
+     "an",
+     "array",
+     "of",
+     "strings"]
+s
+```
+
+You can also insert `julia` functions within arrays:
+```julia
+trigonometric_functions = [sin, cos, tan]
+trigonometric_functions
+```
+Arrays can be made of *anything*, and they will be called type `Any`:
+```julia
+any = ["all",
+     "these",
+     64,
+     "apples",
+     "need to be cut in ",
+     "0.5"]
+any
+```
+
+#### Empty arrays
+
+You can also create empty arrays by telling its type follewed by `[]`:
+
+```julia
+empty_int = Int64[]
+empty_int
+```
+
+```julia
+empty_flt = Float64[]
+empty_flt
+```
+
+```julia
+empty_str = String[]
+empty_str
+```
+
+#### Unitialized Arrays
+
+If you already have a desired length of an array, but nothing to insert in it,
+you can create `unitialized` arrays using `Array{type}(undef, dimensions)`.
+`undef` here means that your array has not been initalized to known values.
+
+```julia
+undef_int64 = Array{Int64}(undef, 5)
+undef_int64
+```
+
+> Random numbers are inserted in your array to let you know that there is no
+> sensible information within it.
+
+> You can try the function `Vector(undef, 5)` as a shortcut to create an
+> unitialized array of a vector array of a given length. Note that this will not
+> work for not `undef` arrays.
+
+#### Filled arrays
+
+You can use other functions to create filled arrays. For example, to create an array fill with zeros, you can use `zeros(m)`.
+
+### Multi-demensional arrays
+
+All arrays we have created had just one dimension (i.e. they were vectors). To
+start working towards multi-dimensional arrays, let's create another vector and
+see what happens if we remove the `,` that separates the elements:
+
+```julia
+# creating an array with comma-separated elements
+[4, 5, 8, 6, 7, 10]
+```
+
+```julia
+# creating an array without commas separating elements
+[4 5 8 6 7 10]
+```
+> Observe that the first one is called `6-element Array{Int64,1}:`, while the
+> second one is called `1x6 Array{Int64,2}:`. This tells us that by removing
+> *commas*, we are creating arrays that can be recognized as matrices, and not
+> vectors.
+
+We can add rows to our last matrix by adding semi-colons when creating it, as
+follows:
+
+```julia
+[4 5 8 6 7 10; 2 3 4 5 6 7]
+```
+
+Intuitively, we can do this again to add more rows to our array:
+
+```julia
+[4 5 8 6 7 10; 2 3 4 5 6 7; 10 23 23 43 54.4 65.5]
+```
+
+
+## Creating and manipulating strings
+Strings in Julia are delimited by double or triple double quotes.
+
+```{julia}
+"Hello, world.\n"
+
+# or
+
+"""Contains "quote" characters"""
+```
+> The difference between them is that the triple quote strings allows you to
+> use ordinary quotes inside the strings without having to put backslashes before
+> them.
+
+It is important to know two things about `strings` in `Julia`: (i) **they are
+immutable**, i.e. you will not be able to change them once you create them; (ii)
+if you want to insert double quotes (") or dollar signs ($) within your string,
+you have to preceed them by backslashes - unless your string has already been
+delimited by the triple double quotes 😺!
+
+```{julia}
+money = "I have \$1 dollar in my pocket."
+println(money)
+```
+>> Try running `"Look, "no errors!" were shown!"` and see what happens!
+
+> *Note: We can't create `strings` in `julia` using single quotation marks, as
+> Julia will recognize it as a `Char`-type variable.
+
+### String interpolation
+
+We can insert existing variables into a string or evaluate expressions within strings using the `$` before your variable name. Look at the example below:
+```{julia}
+species_name = "Artibeus lituratus"
+male_count = 10
+female_count = 13
+```
+
+```{julia; hold = true}
+println("$male_count male and $female_count female individuals of $species_name were collected.")
+println("In total, $(male_count + female_count) individuals of $species_name were collected.")
+```
+### Substrings
+
+You can extract substrings (or smaller strings) from strings. For this, you can
+use either `getindex(yourstring, range)` or `yourstring[range]`. You can then
+use the same techniques as you would use to extract elements from arrays:
+
+```{julia}
+genus = species_name[1:8]
+species = species_name[10:end]
+
+genus
+species
+```
+
+### String concatenation
+
+You can also concatenate strings with the help of the function `string()` or the `*` operator:
+```{julia}
+string(male_count, " males of ", species_name)
+```
+
+```{julia}
+string(male_count," males of ")*species_name
+```
